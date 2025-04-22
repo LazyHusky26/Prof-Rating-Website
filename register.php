@@ -1,36 +1,3 @@
-<?php
-include("site_database.php");
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = filter_input(INPUT_POST, "name", FILTER_SANITIZE_SPECIAL_CHARS);
-    $email = filter_input(INPUT_POST, "email", FILTER_SANITIZE_EMAIL);
-    $password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_SPECIAL_CHARS);
-    $confirmPassword = filter_input(INPUT_POST, "confirmPassword", FILTER_SANITIZE_SPECIAL_CHARS);
-
-    $student_id_name = $_FILES['studentIdUpload']['name'];
-    $student_id_tmp = $_FILES['studentIdUpload']['tmp_name'];
-
-    $upload_dir = "uploads/";
-    $upload_path = $upload_dir . basename($student_id_name);
-
-    if (move_uploaded_file($student_id_tmp, $upload_path)) {
-        if (!empty($password)) {
-            $hash = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "INSERT INTO student_login (name, email, password, student_id) 
-                    VALUES ('$name', '$email', '$hash', '$student_id_name')";
-            if (mysqli_query($conn, $sql)) {
-                header("Location: " . $_SERVER['PHP_SELF'] . "?success=1");
-                exit();
-            }
-        }
-    } else {
-        echo "<script>alert('⚠ Failed to upload image.');</script>";
-    }
-}
-
-mysqli_close($conn);
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,10 +25,10 @@ mysqli_close($conn);
         h2 {
             color: #FFD700;
             margin-bottom: 20px;
-            font-size: 35px; 
+            font-size: 35px;
             font-weight: bold;
         }
-        input {
+        input, select {
             width: 90%;
             height: 45px;
             padding: 10px;
@@ -102,13 +69,62 @@ mysqli_close($conn);
             margin: 15px 0;
             text-align: center;
         }
-        .student-id-preview {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border: 2px solid #FFD700;
-            display: block;
-            margin: auto;
+        .toggle-switch {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px; /* Reduced gap here */
+            flex-direction: column;
+        }
+        .toggle-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+            margin: 0 10px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            background-color: #ccc;
+            border-radius: 34px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transition: 0.4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: black;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #FFD700;
+        }
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        .upload-label {
+            text-align: left;
+            color: #FFD700;
+            font-weight: bold;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -119,8 +135,23 @@ mysqli_close($conn);
 <?php endif; ?>
 
 <div class="container">
+    <!-- Register as label and toggle switch -->
+    <div class="toggle-switch">
+        <span class="toggle-label">Register as:</span>
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+            <span>Student</span>
+            <label class="switch">
+                <input type="checkbox" id="userTypeToggle">
+                <span class="slider"></span>
+            </label>
+            <span>Professor</span>
+        </div>
+    </div>
+
     <h2>Create an Account</h2>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" id="registerForm" enctype="multipart/form-data">
+        <input type="hidden" id="hiddenUserType" name="userType" value="student">
+
         <input type="text" id="name" name="name" placeholder="Full Name" required>
         <div class="error" id="nameError"></div>
 
@@ -133,10 +164,21 @@ mysqli_close($conn);
         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
         <div class="error" id="confirmError"></div>
 
-        <div class="student-id-upload-container">
-            <label for="studentIdUpload" style="color: #FFD700; font-weight: bold;">Upload Student ID</label>
-            <input type="file" id="studentIdUpload" name="studentIdUpload" accept="image/*" required>
+        <!-- Student Section -->
+        <div class="student-id-upload-container" id="studentIdSection">
+            <label for="studentIdUpload" class="upload-label">Upload Student ID</label>
+            <input type="file" id="studentIdUpload" name="studentIdUpload" accept="image/*">
             <div class="error" id="studentIdError"></div>
+        </div>
+
+        <!-- Professor Section -->
+        <div class="student-id-upload-container" id="professorDocSection" style="display: none;">
+            <input type="text" id="universityName" name="universityName" placeholder="University Name">
+            <div class="error" id="universityError"></div>
+
+            <label for="professorDocUpload" class="upload-label">Verification Document</label>
+            <input type="file" id="professorDocUpload" name="professorDocUpload" accept=".pdf,.doc,.docx,image/*">
+            <div class="error" id="professorDocError"></div>
         </div>
 
         <button type="submit">Register</button>
@@ -144,77 +186,20 @@ mysqli_close($conn);
 </div>
 
 <script>
-document.getElementById("registerForm").addEventListener("submit", function(event) {
-    let name = document.getElementById("name").value.trim();
-    let email = document.getElementById("email").value.trim();
-    let password = document.getElementById("password").value.trim();
-    let confirmPassword = document.getElementById("confirmPassword").value.trim();
-    let studentIdUpload = document.getElementById("studentIdUpload").files[0];
+document.getElementById("userTypeToggle").addEventListener("change", function () {
+    const isProfessor = this.checked;
+    const studentSection = document.getElementById("studentIdSection");
+    const professorSection = document.getElementById("professorDocSection");
+    const hiddenType = document.getElementById("hiddenUserType");
 
-    let nameError = document.getElementById("nameError");
-    let emailError = document.getElementById("emailError");
-    let passwordError = document.getElementById("passwordError");
-    let confirmError = document.getElementById("confirmError");
-    let studentIdError = document.getElementById("studentIdError");
-
-    nameError.textContent = "";
-    emailError.textContent = "";
-    passwordError.textContent = "";
-    confirmError.textContent = "";
-    studentIdError.textContent = "";
-
-    let valid = true;
-    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    let passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}$/;
-
-    if (name.length < 3) {
-        nameError.textContent = "⚠ Name must be at least 3 characters.";
-        valid = false;
-    }
-
-    if (!emailRegex.test(email)) {
-        emailError.textContent = "⚠ Enter a valid email.";
-        valid = false;
-    }
-
-    if (!passwordRegex.test(password)) {
-        passwordError.textContent = "⚠ Password must be at least 6 characters, include a number & special character.";
-        valid = false;
-    }
-
-    if (password !== confirmPassword) {
-        confirmError.textContent = "⚠ Passwords do not match.";
-        valid = false;
-    }
-
-    if (!studentIdUpload) {
-        studentIdError.textContent = "⚠ Please upload a picture of your student ID.";
-        valid = false;
-    }
-
-    if (!valid) {
-        event.preventDefault();
-    }
-});
-
-document.getElementById("studentIdUpload").addEventListener("change", function(event) {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.querySelector('.student-id-preview');
-            if (preview) {
-                preview.src = e.target.result;
-            } else {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.classList.add('student-id-preview');
-                document.querySelector('.student-id-upload-container').appendChild(img);
-            }
-        };
-        reader.readAsDataURL(file);
+    if (isProfessor) {
+        studentSection.style.display = "none";
+        professorSection.style.display = "block";
+        hiddenType.value = "professor";
     } else {
-        alert("⚠ Please upload a valid image file.");
+        studentSection.style.display = "block";
+        professorSection.style.display = "none";
+        hiddenType.value = "student";
     }
 });
 </script>
