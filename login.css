@@ -1,0 +1,216 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body, html {
+  height: 100%;
+  background: radial-gradient(circle at 20% 20%, #111 30%, #000 100%);
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Background layers */
+.stars-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('https://i.imgur.com/N7xw0fb.png');
+  background-size: cover;
+  opacity: 0.1;
+  z-index: -3;
+}
+
+.fog-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('https://i.imgur.com/BfK0wR8.png');
+  background-size: cover;
+  opacity: 0.15;
+  z-index: -2;
+  mix-blend-mode: screen;
+}
+
+/* Floating Particles */
+.particles::before,
+.particles::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #facc15 0%, transparent 60%);
+  opacity: 0.08;
+  filter: blur(80px);
+  animation: float 12s infinite alternate ease-in-out;
+}
+
+.particles::before {
+  width: 300px;
+  height: 300px;
+  top: 20%;
+  left: 15%;
+}
+
+.particles::after {
+  width: 250px;
+  height: 250px;
+  bottom: 10%;
+  right: 10%;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(20px); }
+}
+
+/* Navbar */
+.navbar {
+  width: 100%;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  color: #facc15;
+  font-weight: 600;
+}
+
+.nav-links a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #fff;
+  transition: color 0.3s ease;
+  font-weight: 400;
+}
+
+.nav-links a.cta {
+  background-color: #facc15;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #000;
+  font-weight: 600;
+}
+
+.nav-links a:hover {
+  color: #facc15;
+}
+
+/* Login Form */
+.login-container {
+  height: calc(100vh - 100px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 30px;
+  padding: 70px 60px;
+  width: 600px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(250, 204, 21, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.login-card h2 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.welcome-text {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  color: #ddd;
+}
+
+.login-card .signup {
+  font-size: 1rem;
+  margin-bottom: 25px;
+}
+
+.login-card .signup a {
+  color: #facc15;
+  text-decoration: none;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 18px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.login-card input:focus {
+  box-shadow: 0 0 5px 2px #facc15;
+}
+
+.forgot {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.forgot a {
+  font-size: 0.85rem;
+  color: #facc15;
+  text-decoration: none;
+}
+
+.login-btn {
+  background: #facc15;
+  color: #000;
+  border: none;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.login-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 12px 2px #facc15;
+}
+
+/* Footer quote */
+.footer-quote {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #facc15;
+  opacity: 0.8;
+}
+
+/* Fade Animation */
+.animate-fade {
+  animation: fadeIn 1s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
