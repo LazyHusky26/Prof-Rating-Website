@@ -1,3 +1,75 @@
+<?php
+include("site_database.php");
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get form data
+    $name = filter_input(INPUT_POST, "name", FILTER_SANITIZE_SPECIAL_CHARS);
+    $email = filter_input(INPUT_POST, "email", FILTER_SANITIZE_EMAIL);
+    $password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_SPECIAL_CHARS);
+    $confirmPassword = filter_input(INPUT_POST, "confirmPassword", FILTER_SANITIZE_SPECIAL_CHARS);
+    $userType = filter_input(INPUT_POST, "userType", FILTER_SANITIZE_SPECIAL_CHARS);
+
+    // Handle file upload for student
+    $student_id_name = "";
+    if ($userType === "student") {
+        $student_id_name = $_FILES['studentIdUpload']['name'];
+        $student_id_tmp = $_FILES['studentIdUpload']['tmp_name'];
+        $upload_dir = "uploads/";
+        $upload_path = $upload_dir . basename($student_id_name);
+
+        if (!move_uploaded_file($student_id_tmp, $upload_path)) {
+            echo "<script>alert('⚠ Failed to upload student ID image.');</script>";
+        }
+    }
+
+    // Handle file upload for professor
+    $professor_doc_name = "";
+    if ($userType === "professor") {
+        $professor_doc_name = $_FILES['professorDocUpload']['name'];
+        $professor_doc_tmp = $_FILES['professorDocUpload']['tmp_name'];
+        $upload_dir = "uploads/";
+        $upload_path = $upload_dir . basename($professor_doc_name);
+
+        if (!move_uploaded_file($professor_doc_tmp, $upload_path)) {
+            echo "<script>alert('⚠ Failed to upload professor verification document.');</script>";
+        }
+    }
+
+    // Process password and confirm password
+    if (!empty($password) && $password === $confirmPassword) {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
+        // Check for duplicate email
+        $check_query = "SELECT * FROM " . ($userType === "student" ? "student_login" : "professor_login") . " WHERE email = '$email'";
+        $check_result = mysqli_query($conn, $check_query);
+
+        if (mysqli_num_rows($check_result) > 0) {
+            echo "<script>alert('⚠ Email already exists. Please use a different email.');</script>";
+        } else {
+            // Prepare SQL query based on user type
+            if ($userType === "student") {
+                $sql = "INSERT INTO student_login (name, email, password, student_id) VALUES ('$name', '$email', '$hash', '$student_id_name')";
+            } else if ($userType === "professor") {
+                $universityName = filter_input(INPUT_POST, "universityName", FILTER_SANITIZE_SPECIAL_CHARS);
+                $sql = "INSERT INTO professor_login (name, email, password, university_name, verification_document) 
+                        VALUES ('$name', '$email', '$hash', '$universityName', '$professor_doc_name')";
+            }
+
+            // Execute query
+            if (mysqli_query($conn, $sql)) {
+                header("Location: " . $_SERVER['PHP_SELF'] . "?success=1");
+                exit();
+            } else {
+                echo "<script>alert('⚠ Registration failed. Please try again.');</script>";
+            }
+        }
+    } else {
+        echo "<script>alert('⚠ Passwords do not match or are empty.');</script>";
+    }
+}
+
+mysqli_close($conn);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +145,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 5px; /* Reduced gap here */
+            margin-bottom: 5px;
             flex-direction: column;
         }
         .toggle-label {
