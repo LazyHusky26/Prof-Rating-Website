@@ -51,8 +51,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $sql = "INSERT INTO student_login (name, email, password, student_id) VALUES ('$name', '$email', '$hash', '$student_id_name')";
             } else if ($userType === "professor") {
                 $universityName = filter_input(INPUT_POST, "universityName", FILTER_SANITIZE_SPECIAL_CHARS);
-                $sql = "INSERT INTO professor_login (name, email, password, university_name, verification_document) 
-                        VALUES ('$name', '$email', '$hash', '$universityName', '$professor_doc_name')";
+                $department = filter_input(INPUT_POST, "department", FILTER_SANITIZE_SPECIAL_CHARS); // New department field
+                $sql = "INSERT INTO professor_login (name, email, password, university_name, department, verification_document) 
+                        VALUES ('$name', '$email', '$hash', '$universityName', '$department', '$professor_doc_name')";
             }
 
             // Execute query
@@ -83,16 +84,20 @@ mysqli_close($conn);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh; /* Ensure the body takes the full viewport height */
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         .container {
             background: #222;
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(255, 215, 0, 0.5);
-            width: 600px;
+            width: 90%; /* Make it responsive */
+            max-width: 600px; /* Limit the maximum width */
             text-align: center;
+            box-sizing: border-box;
         }
         h2 {
             color: #FFD700;
@@ -101,7 +106,7 @@ mysqli_close($conn);
             font-weight: bold;
         }
         input, select {
-            width: 90%;
+            width: 100%; /* Adjust width to fit container */
             height: 45px;
             padding: 10px;
             margin: 8px 0;
@@ -110,12 +115,13 @@ mysqli_close($conn);
             background: #333;
             color: #FFD700;
             font-size: 16px;
+            box-sizing: border-box;
         }
         input::placeholder {
             color: #bbb;
         }
         button {
-            width: 90%;
+            width: 100%; /* Adjust width to fit container */
             height: 50px;
             background: #FFD700;
             color: #000;
@@ -134,7 +140,7 @@ mysqli_close($conn);
             font-size: 13px;
             margin-bottom: 5px;
             text-align: left;
-            width: 90%;
+            width: 100%; /* Adjust width to fit container */
             display: inline-block;
         }
         .student-id-upload-container {
@@ -247,6 +253,9 @@ mysqli_close($conn);
         <div class="student-id-upload-container" id="professorDocSection" style="display: none;">
             <input type="text" id="universityName" name="universityName" placeholder="University Name">
             <div class="error" id="universityError"></div>
+
+            <input type="text" id="department" name="department" placeholder="Department"> <!-- New department input -->
+            <div class="error" id="departmentError"></div>
 
             <label for="professorDocUpload" class="upload-label">Verification Document</label>
             <input type="file" id="professorDocUpload" name="professorDocUpload" accept=".pdf,.doc,.docx,image/*">
