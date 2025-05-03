@@ -1,3 +1,54 @@
+<?php
+// Include database connection file
+include('site_database.php');
+
+// Get professor ID from the query string (e.g., profile.php?id=1)
+$professor_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+// Fetch professor details from the database
+$sql = "SELECT name, department, university FROM prof_login WHERE id = $professor_id";
+$result = mysqli_query($conn, $sql);
+
+if (mysqli_num_rows($result) > 0) {
+    $professor = mysqli_fetch_assoc($result);
+    $professor_name = $professor['name'];
+    $department = $professor['department'];
+    $university = $professor['university'];
+} else {
+    // Redirect to an error page if the professor is not found
+    header("Location: error.php?error=professor_not_found");
+    exit();
+}
+
+// Calculate the average rating for the professor
+$avg_rating_sql = "SELECT COALESCE(AVG(rating), 0) AS avg_rating FROM prof_ratings WHERE prof_id = $professor_id";
+$avg_rating_result = mysqli_query($conn, $avg_rating_sql);
+
+if ($avg_rating_result && mysqli_num_rows($avg_rating_result) > 0) {
+    $avg_rating_row = mysqli_fetch_assoc($avg_rating_result);
+    $avg_rating = number_format($avg_rating_row['avg_rating'], 1); // Format to 1 decimal place
+} else {
+    $avg_rating = "0.0"; // Default value if no ratings exist
+}
+
+// Fetch rating distribution for the professor
+$ratings_sql = "SELECT rating, COUNT(*) as count FROM prof_ratings WHERE prof_id = $professor_id GROUP BY rating ORDER BY rating DESC";
+$ratings_result = mysqli_query($conn, $ratings_sql);
+
+$rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+$total_ratings = 0;
+
+while ($row = mysqli_fetch_assoc($ratings_result)) {
+    $rating_distribution[$row['rating']] = $row['count'];
+    $total_ratings += $row['count'];
+}
+
+// Calculate percentage for each rating
+foreach ($rating_distribution as $rating => $count) {
+    $rating_distribution[$rating] = $total_ratings > 0 ? ($count / $total_ratings) * 100 : 0;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -191,6 +242,7 @@
 
 
 
+
         /* Hidden Content */
         .content {
             display: none;
@@ -209,48 +261,34 @@
 
     <!-- Professor Name -->
     <div class="professor-name">
-        Professor Name: <span class="highlighted-name">Dr. John Doe</span>
+        Professor Name: <span class="highlighted-name"><?php echo htmlspecialchars($professor_name); ?></span>
     </div>
     
 
     <!-- Rating -->
     <div class="professor-rating">
-        <span class="rating-number">4.0</span> / 5
+        <span class="rating-number"><?php echo $avg_rating; ?></span> / 5
     </div>
     
 
     <!-- Department and University Info -->
     <div class="professor-info">
-        Dr. John Doe works in the Department of Computer Science at XYZ University.
+        <?php echo htmlspecialchars($professor_name); ?> works in the Department of <?php echo htmlspecialchars($department); ?> at <?php echo htmlspecialchars($university); ?>.
     </div>
 
     <div class="rate-button-container">
-        <a href="index(questions).html" class="rate-button">Rate This Professor</a>
+        <a href="rate_professor.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
     </div>
     
 
     <!-- Rating Distribution -->
     <div class="rating-distribution">
+        <?php foreach ($rating_distribution as $rating => $percentage): ?>
         <div class="bar-container">
-            <div class="bar-label">5</div>
-            <div class="bar" style="width: 80%;"></div>
+            <div class="bar-label"><?php echo $rating; ?></div>
+            <div class="bar" style="width: <?php echo $percentage; ?>%;"></div>
         </div>
-        <div class="bar-container">
-            <div class="bar-label">4</div>
-            <div class="bar" style="width: 60%;"></div>
-        </div>
-        <div class="bar-container">
-            <div class="bar-label">3</div>
-            <div class="bar" style="width: 40%;"></div>
-        </div>
-        <div class="bar-container">
-            <div class="bar-label">2</div>
-            <div class="bar" style="width: 20%;"></div>
-        </div>
-        <div class="bar-container">
-            <div class="bar-label">1</div>
-            <div class="bar" style="width: 10%;"></div>
-        </div>
+        <?php endforeach; ?>
     </div>
 
     <!-- Hidden Content -->
@@ -258,9 +296,12 @@
 
     <div class="review-section">
         <h2>Leave a Review</h2>
-        <textarea class="review-box" placeholder="Write your review here..."></textarea>
-        <br>
-        <button class="submit-review">Submit Review</button>
+        <form action="submit_review.php" method="POST">
+            <textarea class="review-box" name="review" placeholder="Write your review here..." required></textarea>
+            <input type="hidden" name="prof_id" value="<?php echo $professor_id; ?>">
+            <br>
+            <button type="submit" class="submit-review">Submit Review</button>
+        </form>
     </div>
     
 
