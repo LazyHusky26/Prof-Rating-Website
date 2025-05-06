@@ -20,8 +20,8 @@ if (mysqli_num_rows($result) > 0) {
     exit();
 }
 
-// Calculate the average rating for the professor
-$avg_rating_sql = "SELECT COALESCE(AVG(rating), 0) AS avg_rating FROM prof_ratings WHERE prof_id = $professor_id";
+// Calculate the total average rating for the professor from `prof_avg_ratings`
+$avg_rating_sql = "SELECT COALESCE(AVG(avg_rating), 0) AS avg_rating FROM prof_avg_ratings WHERE prof_id = $professor_id";
 $avg_rating_result = mysqli_query($conn, $avg_rating_sql);
 
 if ($avg_rating_result && mysqli_num_rows($avg_rating_result) > 0) {
@@ -31,16 +31,16 @@ if ($avg_rating_result && mysqli_num_rows($avg_rating_result) > 0) {
     $avg_rating = "0.0"; // Default value if no ratings exist
 }
 
-// Fetch rating distribution for the professor
-$ratings_sql = "SELECT rating, COUNT(*) as count FROM prof_ratings WHERE prof_id = $professor_id GROUP BY rating ORDER BY rating DESC";
+// Fetch rounded rating distribution for the professor
+$ratings_sql = "SELECT rounded_rating, COUNT(*) as count FROM prof_avg_ratings WHERE prof_id = $professor_id GROUP BY rounded_rating ORDER BY rounded_rating DESC";
 $ratings_result = mysqli_query($conn, $ratings_sql);
 
 $rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
 $total_ratings = 0;
 
 while ($row = mysqli_fetch_assoc($ratings_result)) {
-    $rating_distribution[$row['rating']] = $row['count'];
-    $total_ratings += $row['count'];
+    $rating_distribution[$row['rounded_rating']] = $row['count'];
+    $total_ratings += $row['count']; // Calculate total ratings
 }
 
 // Calculate percentage for each rating
@@ -126,6 +126,9 @@ foreach ($rating_distribution as $rating => $count) {
     font-family: 'UnifrakturMaguntia', cursive; /* Same font */
 }
 
+.highlighted-rating {
+    color: #e6bd09; /* Yellow color */
+}
 
 
 
@@ -247,6 +250,13 @@ foreach ($rating_distribution as $rating => $count) {
         .content {
             display: none;
         }
+
+        .highlighted-name,
+        .highlighted-department,
+        .highlighted-university {
+            color: #e6bd09; /* Yellow color */
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -267,14 +277,16 @@ foreach ($rating_distribution as $rating => $count) {
 
     <!-- Rating -->
     <div class="professor-rating">
-        <span class="rating-number"><?php echo $avg_rating; ?></span> / 5
+        <span class="rating-number highlighted-rating"><?php echo $avg_rating; ?></span> / 5
     </div>
     
 
     <!-- Department and University Info -->
     <div class="professor-info">
-        <?php echo htmlspecialchars($professor_name); ?> works in the Department of <?php echo htmlspecialchars($department); ?> at <?php echo htmlspecialchars($university); ?>.
-    </div>
+    <span class="highlighted-name"><?php echo htmlspecialchars($professor_name); ?></span> works in the Department of 
+    <span class="highlighted-department"><?php echo htmlspecialchars($department); ?></span> at 
+    <span class="highlighted-university"><?php echo htmlspecialchars($university); ?></span>.
+</div>
 
     <div class="rate-button-container">
         <a href="rate_professor.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
@@ -283,6 +295,7 @@ foreach ($rating_distribution as $rating => $count) {
 
     <!-- Rating Distribution -->
     <div class="rating-distribution">
+        <h3>Rating Distribution (<?php echo $total_ratings; ?> Ratings)</h3>
         <?php foreach ($rating_distribution as $rating => $percentage): ?>
         <div class="bar-container">
             <div class="bar-label"><?php echo $rating; ?></div>
