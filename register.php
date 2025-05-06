@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
         // Check for duplicate email
-        $check_query = "SELECT * FROM " . ($userType === "student" ? "student_login" : "professor_login") . " WHERE email = '$email'";
+        $check_query = "SELECT * FROM " . ($userType === "student" ? "student_login" : "prof_login") . " WHERE email = '$email'";
         $check_result = mysqli_query($conn, $check_query);
 
         if (mysqli_num_rows($check_result) > 0) {
@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else if ($userType === "professor") {
                 $universityName = filter_input(INPUT_POST, "universityName", FILTER_SANITIZE_SPECIAL_CHARS);
                 $department = filter_input(INPUT_POST, "department", FILTER_SANITIZE_SPECIAL_CHARS); // New department field
-                $sql = "INSERT INTO professor_login (name, email, password, university_name, department, verification_document) 
+                $sql = "INSERT INTO prof_login (name, email, password, university, department, veri_doc) 
                         VALUES ('$name', '$email', '$hash', '$universityName', '$department', '$professor_doc_name')";
             }
 
