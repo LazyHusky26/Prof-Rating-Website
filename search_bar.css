@@ -1,0 +1,127 @@
+/* General Styles */
+body {
+    background: black; /* Black background */
+    color: white; /* White text for contrast */
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navigation Bar */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/* Logo */
+.logo {
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    width: 400px; /* Same width as the search bar */
+    height: 50px; /* Same height as the search bar */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    border: 2px solid white; /* Add border to match the search bar */
+    border-radius: 25px; /* Rounded corners */
+    overflow: hidden; /* Clip inner content */
+    background: gray; /* Default background color */
+    box-sizing: border-box; /* Include padding and border in width/height */
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%; /* Full width of the toggle switch */
+    height: 100%; /* Full height of the toggle switch */
+    padding: 0 20px; /* Add padding for text */
+    background-color: black; /* Set the toggle bar background to black */
+    transition: background-color 0.4s;
+    z-index: 1; /* Ensure text is above the yellow button */
+}
+
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 100%;
+    width: 50%;
+    background-color: #ffcc00; /* Highlight color for the yellow button */
+    border-radius: 25px;
+    transform: translateX(-13%); /* Move slightly to the left */
+    transition: transform 0.4s;
+    z-index: 0; /* Ensure yellow button is below the text */
+}
+
+input:checked + .slider::before {
+    transform: translateX(95%); /* Adjust to ensure proper alignment when toggled */
+}
+
+.toggle-text {
+    font-size: 16px;
+    color: white;
+    font-weight: bold;
+    pointer-events: none; /* Prevent interaction */
+    z-index: 2; /* Ensure text is always visible */
+}
+
+.toggle-text.left {
+    text-align: left;
+}
+
+.toggle-text.right {
+    text-align: right;
+}
+
+/* Centered Search Bar */
+.search-container {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full page height */
+    gap: 20px; /* Add spacing between toggle and search bar */
+}
+
+.search-bar {
+    width: 400px;
+    padding: 15px;
+    font-size: 18px;
+    border: 2px solid white;
+    border-radius: 25px;
+    background: transparent;
+    color: white;
+    text-align: center;
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-bar::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-bar:focus {
+    width: 450px;
+    border-color: #ffcc00;
+}
