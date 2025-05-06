@@ -5,6 +5,10 @@ body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
+    display: flex; /* Use flexbox to center everything */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Full viewport height */
 }
 
 /* Navigation Bar */
@@ -39,7 +43,7 @@ header {
     border: 2px solid white; /* Add border to match the search bar */
     border-radius: 25px; /* Rounded corners */
     overflow: hidden; /* Clip inner content */
-    background: gray; /* Default background color */
+    background: black; /* Set the background to black to match the slider */
     box-sizing: border-box; /* Include padding and border in width/height */
 }
 
@@ -98,30 +102,69 @@ input:checked + .slider::before {
 .search-container {
     display: flex;
     flex-direction: column; /* Stack items vertically */
-    justify-content: center;
-    align-items: center;
-    height: 100vh; /* Full page height */
+    justify-content: center; /* Center items vertically */
+    align-items: center; /* Center items horizontally */
+    position: relative; /* Ensure the dropdown is positioned relative to the search container */
+    width: 400px; /* Match the width of the search bar */
     gap: 20px; /* Add spacing between toggle and search bar */
 }
 
 .search-bar {
-    width: 400px;
+    width: 100%; /* Match the width of the container */
     padding: 15px;
     font-size: 18px;
     border: 2px solid white;
     border-radius: 25px;
     background: transparent;
     color: white;
-    text-align: center;
+    text-align: center; /* Center text horizontally */
+    line-height: 1.5; /* Adjust line height for vertical centering */
     outline: none;
     transition: 0.3s;
+    z-index: 2; /* Ensure the search bar is above the dropdown */
+    box-sizing: border-box; /* Include padding and border in width/height */
 }
 
 .search-bar::placeholder {
     color: rgba(255, 255, 255, 0.7);
+    text-align: center; /* Center placeholder text horizontally */
 }
 
 .search-bar:focus {
-    width: 450px;
     border-color: #ffcc00;
+}
+
+/* Dropdown for Search Results */
+.search-results {
+    position: absolute; /* Position the dropdown relative to the search container */
+    top: calc(100% + 5px); /* Place the dropdown slightly below the search bar */
+    left: 0;
+    width: 100%; /* Match the width of the search bar */
+    background: #fff; /* White background for the dropdown */
+    border: 1px solid #ccc; /* Add a border to the dropdown */
+    max-height: 250px; /* Limit the height of the dropdown */
+    overflow-y: auto; /* Add scroll if the results exceed the max height */
+    display: none; /* Initially hide the dropdown */
+    z-index: 1000; /* Ensure the dropdown appears above other elements */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for better visibility */
+    border-radius: 8px; /* Add rounded corners for a modern look */
+    padding: 5px 0; /* Add padding inside the dropdown */
+    box-sizing: border-box; /* Include padding and border in width/height */
+}
+
+.result-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee; /* Add a separator between items */
+    cursor: pointer;
+    font-size: 16px;
+    color: #333; /* Dark text for better readability */
+}
+
+.result-item:hover {
+    background: #f0f0f0; /* Highlight the item on hover */
+}
+
+/* Remove the last item's border */
+.result-item:last-child {
+    border-bottom: none;
 }
