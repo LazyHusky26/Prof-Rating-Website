@@ -1,48 +1,39 @@
 <?php
-// Include database connection file
-include('site_database.php');  // Include the connection to your database
+session_start();
+include('site_database.php');
 
-// Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get the email and password from the form
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Sanitize inputs to prevent SQL injection
     $email = mysqli_real_escape_string($conn, $email);
     $password = mysqli_real_escape_string($conn, $password);
 
-    // Query to find user in the professor table
     $prof_query = "SELECT id, name, email, password FROM prof_login WHERE email = '$email'";
     $prof_result = mysqli_query($conn, $prof_query);
 
-    // Query to find user in the student table
     $student_query = "SELECT id, name, email, password FROM student_login WHERE email = '$email'";
     $student_result = mysqli_query($conn, $student_query);
 
-    // Check if the user exists in the professor table
     if (mysqli_num_rows($prof_result) > 0) {
         $user = mysqli_fetch_assoc($prof_result);
 
-        // Verify the password
         if (password_verify($password, $user['password'])) {
             echo "<script>alert('Login successful! Welcome, Professor " . $user['name'] . "');</script>";
         } else {
             echo "<script>alert('Failed: Incorrect password.');</script>";
         }
-    }
-    // Check if the user exists in the student table
-    elseif (mysqli_num_rows($student_result) > 0) {
+    } elseif (mysqli_num_rows($student_result) > 0) {
         $user = mysqli_fetch_assoc($student_result);
 
-        // Verify the password
         if (password_verify($password, $user['password'])) {
+            $_SESSION['student_id'] = $user['id'];
+            $_SESSION['student_name'] = $user['name'];
             echo "<script>alert('Login successful! Welcome, Student " . $user['name'] . "');</script>";
         } else {
             echo "<script>alert('Failed: Incorrect password.');</script>";
         }
     } else {
-        // No user found in either table
         echo "<script>alert('Failed: No user found with the provided email address.');</script>";
     }
 }
@@ -73,7 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <div class="login-container">
     <?php
-    // Display error messages based on the query parameter
     if (isset($_GET['error'])) {
         if ($_GET['error'] == 'user_not_found') {
             echo "<script>alert('⚠ No user found with the provided email address. Please check and try again.');</script>";
