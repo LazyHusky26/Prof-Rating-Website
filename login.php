@@ -12,34 +12,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = mysqli_real_escape_string($conn, $email);
     $password = mysqli_real_escape_string($conn, $password);
 
-    // Query to find user with the provided email
-    $sql = "SELECT id, name, email, password, university, veri_doc, reg_date FROM prof_login WHERE email = '$email'";
-    $result = mysqli_query($conn, $sql);
+    // Query to find user in the professor table
+    $prof_query = "SELECT id, name, email, password FROM prof_login WHERE email = '$email'";
+    $prof_result = mysqli_query($conn, $prof_query);
 
-    // Check if a user with the provided email exists
-    if (mysqli_num_rows($result) > 0) {
-        // User found, fetch the user data
-        $user = mysqli_fetch_assoc($result);
+    // Query to find user in the student table
+    $student_query = "SELECT id, name, email, password FROM student_login WHERE email = '$email'";
+    $student_result = mysqli_query($conn, $student_query);
 
-        // Verify the password (assuming it's hashed)
+    // Check if the user exists in the professor table
+    if (mysqli_num_rows($prof_result) > 0) {
+        $user = mysqli_fetch_assoc($prof_result);
+
+        // Verify the password
         if (password_verify($password, $user['password'])) {
-            // Successful login
-            session_start();
-            $_SESSION['user_id'] = $user['id'];  // Store user ID in session
-            $_SESSION['user_name'] = $user['name'];  // Store user name in session
-
-            // Redirect to dashboard or home page
-            header("Location: dashboard.php");
-            exit();
+            echo "<script>alert('Login successful! Welcome, Professor " . $user['name'] . "');</script>";
         } else {
-            // Invalid password
-            header("Location: test.php?error=invalid_password");
-            exit();
+            echo "<script>alert('Failed: Incorrect password.');</script>";
+        }
+    }
+    // Check if the user exists in the student table
+    elseif (mysqli_num_rows($student_result) > 0) {
+        $user = mysqli_fetch_assoc($student_result);
+
+        // Verify the password
+        if (password_verify($password, $user['password'])) {
+            echo "<script>alert('Login successful! Welcome, Student " . $user['name'] . "');</script>";
+        } else {
+            echo "<script>alert('Failed: Incorrect password.');</script>";
         }
     } else {
-        // No user found with this email
-        header("Location: test.php?error=user_not_found");
-        exit();
+        // No user found in either table
+        echo "<script>alert('Failed: No user found with the provided email address.');</script>";
     }
 }
 ?>
