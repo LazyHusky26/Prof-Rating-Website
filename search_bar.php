@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +16,16 @@
     <!-- Navigation Bar -->
     <header>
         <div class="logo">ProfRate 🚀</div>
+        <div class="auth-buttons">
+            <?php if (isset($_SESSION['prof_id']) || isset($_SESSION['student_id'])): ?>
+                <!-- Logout Button -->
+                <button class="logout" onclick="window.location.href='logout.php'">Logout</button>
+            <?php else: ?>
+                <!-- Login and Get Started Buttons -->
+                <button class="login" onclick="window.location.href='login.php'">Log In</button>
+                <button class="signup" onclick="window.location.href='register.php'">Get Started</button>
+            <?php endif; ?>
+        </div>
     </header>
 
     <!-- Search Bar (Centered in the Page) -->
