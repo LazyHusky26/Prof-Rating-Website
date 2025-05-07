@@ -1,0 +1,140 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    height: 100%;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden; /* This prevents scrollbars from causing layout shift */
+    position: relative;
+    background: url('fnnalbg.jpg') center center / cover no-repeat fixed;
+  }
+  
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+  }
+  
+  .logo {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #facc15;
+  }
+  
+  .auth-buttons {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .auth-buttons .login,
+  .auth-buttons .signup {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .login {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+  }
+  
+  .login:hover {
+    background: white;
+    color: black;
+  }
+  
+  .signup {
+    background: #facc15;
+    color: black;
+  }
+  
+  .signup:hover {
+    background: #e6b800;
+  }
+  
+  /* Hero Section */
+  .hero {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 80px;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .hero-content {
+    color: white;
+    max-width: 800px;
+  }
+  
+  .hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+  }
+  
+  .hero-content p {
+    font-size: 1.4rem;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+  }
+  
+  .cta-button {
+    background: #facc15;
+    color: black;
+    padding: 14px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .cta-button:hover {
+    background: #e6b800;
+  }
+  
+  /* Responsive Fix */
+  @media (max-width: 768px) {
+    .hero-content h1 {
+      font-size: 2.5rem;
+    }
+  
+    .hero-content p {
+      font-size: 1.1rem;
+    }
+  
+    .cta-button {
+      padding: 10px 20px;
+    }
+  
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }
+  
