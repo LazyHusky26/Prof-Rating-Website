@@ -1,5 +1,6 @@
 <?php
-$prof_id = isset($_GET['prof_id']) ? intval($_GET['prof_id']) : 0;
+// Retrieve the professor ID from the URL
+$prof_id = isset($_GET['id']) ? intval($_GET['id']) : 0; // Changed 'prof_id' to 'id'
 if ($prof_id === 0) {
     die("Invalid professor ID.");
 }
@@ -96,7 +97,7 @@ if ($prof_id === 0) {
 </head>
 <body>
     <nav>
-        <div class="logo">ProfRate</div>
+        <div class="logo">ProfRate 🚀</div>
     </nav>
     <h2>Professor Rating Questionnaire</h2>
     <form id="questionnaireForm" method="POST" action="submit_ratings.php">
@@ -147,8 +148,8 @@ if ($prof_id === 0) {
                 <label><input type="radio" name="approachability" value="1" required ondblclick="deselectRadio(this)"> 1</label>
                 <label><input type="radio" name="approachability" value="2" ondblclick="deselectRadio(this)"> 2</label>
                 <label><input type="radio" name="approachability" value="3" ondblclick="deselectRadio(this)"> 3</label>
-                <label><input type="radio" name="examBasedOn" value="4" ondblclick="deselectRadio(this)"> 4</label>
-                <label><input type="radio" name="examBasedOn" value="5" ondblclick="deselectRadio(this)"> 5</label>
+                <label><input type="radio" name="approachability" value="4" ondblclick="deselectRadio(this)"> 4</label>
+                <label><input type="radio" name="approachability" value="5" ondblclick="deselectRadio(this)"> 5</label>
             </div>
         </div>
         <div class="question">
