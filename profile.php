@@ -287,7 +287,7 @@ $comments_result = mysqli_query($conn, $comments_sql);
     <div class="navbar">
         <div class="logo">Profrate</div>
         <div>
-            <a href="home.html">Home</a>
+            <a href="search_bar.php">Home</a>
         </div>
     </div>
 
@@ -311,7 +311,7 @@ $comments_result = mysqli_query($conn, $comments_sql);
 
         <!-- Rate Button -->
         <div class="rate-button-container">
-            <a href="rate_professor.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
+            <a href="question.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
         </div>
 
         <!-- Rating Distribution -->
