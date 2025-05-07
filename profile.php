@@ -47,6 +47,10 @@ while ($row = mysqli_fetch_assoc($ratings_result)) {
 foreach ($rating_distribution as $rating => $count) {
     $rating_distribution[$rating] = $total_ratings > 0 ? ($count / $total_ratings) * 100 : 0;
 }
+
+// Fetch reviews for the professor
+$comments_sql = "SELECT comment FROM reviews WHERE prof_id = $professor_id ORDER BY created_at DESC";
+$comments_result = mysqli_query($conn, $comments_sql);
 ?>
 
 <!DOCTYPE html>
@@ -64,22 +68,16 @@ foreach ($rating_distribution as $rating => $count) {
             color: #e6bd09;
             margin: 0;
             padding: 0;
-            height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* Profrate Navbar */
+        /* Navbar */
         .navbar {
             display: flex;
             justify-content: flex-start;
             align-items: center;
             background-color: #000000;
             padding: 10px 20px;
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
-            z-index: 1000;
         }
 
         .navbar a {
@@ -98,61 +96,68 @@ foreach ($rating_distribution as $rating => $count) {
             font-weight: bold;
         }
 
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
         /* Professor Name */
         .professor-name {
-            position: absolute;
-            top: 100px;
-            left: 20px;
-            font-size: 70px;
+            font-size: 40px;
             font-weight: bold;
             color: #ffffff;
+            margin-bottom: 20px;
         }
-        .highlighted-name {
-    color: #e6bd09;
-}
 
+        .highlighted-name {
+            color: #e6bd09;
+        }
 
         /* Rating */
         .professor-rating {
-    position: absolute;
-    top: 300px;
-    left: 20px;
-    font-size: 45px;
-    color: #ffffff;
-    font-family: 'UnifrakturMaguntia', cursive; /* updated font */
-}
+            font-size: 30px;
+            color: #ffffff;
+            font-family: 'UnifrakturMaguntia', cursive;
+            margin-bottom: 20px;
+        }
+
         .rating-number {
-    font-size: 70px; /* Bigger size for just 4.0 */
-    font-family: 'UnifrakturMaguntia', cursive; /* Same font */
-}
+            font-size: 50px;
+            font-family: 'UnifrakturMaguntia', cursive;
+        }
 
-.highlighted-rating {
-    color: #e6bd09; /* Yellow color */
-}
-
-
+        .highlighted-rating {
+            color: #e6bd09;
+        }
 
         /* Department & University */
         .professor-info {
-            position: absolute;
-            top: 250px;
-            left: 20px;
             font-size: 20px;
             color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .highlighted-department {
+            color: #e6bd09;
+            font-weight: bold;
+        }
+
+        .highlighted-university {
+            color: #e6bd09;
+            font-weight: bold;
         }
 
         /* Rating Distribution */
         .rating-distribution {
-            position: absolute;
-            top: 120px;
-            right: 40px;
-            width: 650px;
+            margin-top: 40px;
         }
 
         .bar-container {
             display: flex;
             align-items: center;
-            margin-bottom: 45px;
+            margin-bottom: 20px;
         }
 
         .bar-label {
@@ -162,100 +167,117 @@ foreach ($rating_distribution as $rating => $count) {
         }
 
         .bar {
-    height: 30px; /* Increased from 20px to 30px */
-    background-color: #e6bd09;
-    margin-left: 10px;
-    border-radius: 10px;
-    transition: width 0.8s ease-in-out;
-}
-.rate-button-container {
-    position: absolute;
-    top: 400px; /* Adjust as needed */
-    left: 20px;
-    margin-top: 20px;
-}
-
-.rate-button {
-    display: inline-block;
-    background-color: #e6bd09;
-    color: black;
-    font-size: 20px;
-    font-weight: bold;
-    padding: 12px 24px;
-    text-decoration: none;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-    font-family: Arial, sans-serif;
-}
-
-.rate-button:hover {
-    background-color: #d4aa00;
-}
-
-.review-section {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    background-color: #111;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.review-section h2 {
-    color: #e6bd09;
-    font-family: Arial, sans-serif;
-    margin-bottom: 20px;
-}
-
-.review-box {
-    width: 90%;
-    height: 100px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 2px solid #e6bd09; /* <-- Yellow border added here */
-    resize: none;
-    background-color: #2e2b2b;
-    color: #fff;
-}
-
-
-
-.submit-review {
-    margin-top: 15px;
-    background-color: #e6bd09;
-    color: black;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.submit-review:hover {
-    background-color: #d4aa00;
-}
-
-
-
-
-
-
-        /* Hidden Content */
-        .content {
-            display: none;
+            height: 30px;
+            background-color: #e6bd09;
+            margin-left: 10px;
+            border-radius: 10px;
+            transition: width 0.8s ease-in-out;
         }
 
-        .highlighted-name,
-        .highlighted-department,
-        .highlighted-university {
-            color: #e6bd09; /* Yellow color */
+        /* Rate Button */
+        .rate-button-container {
+            margin-top: 20px;
+        }
+
+        .rate-button {
+            display: inline-block;
+            background-color: #e6bd09;
+            color: black;
+            font-size: 20px;
             font-weight: bold;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            font-family: Arial, sans-serif;
+        }
+
+        .rate-button:hover {
+            background-color: #d4aa00;
+        }
+
+        /* Review Section */
+        .review-section {
+            margin-top: 40px;
+            background-color: #111;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .review-section h2 {
+            color: #e6bd09;
+            font-family: Arial, sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .review-box {
+            width: 90%;
+            height: 100px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #e6bd09;
+            resize: none;
+            background-color: #2e2b2b;
+            color: #fff;
+        }
+
+        .submit-review {
+            margin-top: 15px;
+            background-color: #e6bd09;
+            color: black;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-review:hover {
+            background-color: #d4aa00;
+        }
+
+        /* Reviews Section */
+        .reviews-list {
+            margin-top: 20px;
+            background-color: #111;
+            padding: 20px;
+            border-radius: 10px;
+            color: #e6bd09;
+        }
+
+        .reviews-list h2 {
+            margin-bottom: 20px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: #e6bd09;
+        }
+
+        .review-item {
+            background-color: #222;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .review-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .review-content {
+            font-size: 16px;
+            color: #fff;
+            line-height: 1.5;
+        }
+
+        .review-item:last-child {
+            margin-bottom: 0;
         }
     </style>
 </head>
@@ -269,54 +291,67 @@ foreach ($rating_distribution as $rating => $count) {
         </div>
     </div>
 
-    <!-- Professor Name -->
-    <div class="professor-name">
-        Professor Name: <span class="highlighted-name"><?php echo htmlspecialchars($professor_name); ?></span>
-    </div>
-    
-
-    <!-- Rating -->
-    <div class="professor-rating">
-        <span class="rating-number highlighted-rating"><?php echo $avg_rating; ?></span> / 5
-    </div>
-    
-
-    <!-- Department and University Info -->
-    <div class="professor-info">
-    <span class="highlighted-name"><?php echo htmlspecialchars($professor_name); ?></span> works in the Department of 
-    <span class="highlighted-department"><?php echo htmlspecialchars($department); ?></span> at 
-    <span class="highlighted-university"><?php echo htmlspecialchars($university); ?></span>.
-</div>
-
-    <div class="rate-button-container">
-        <a href="rate_professor.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
-    </div>
-    
-
-    <!-- Rating Distribution -->
-    <div class="rating-distribution">
-        <h3>Rating Distribution (<?php echo $total_ratings; ?> Ratings)</h3>
-        <?php foreach ($rating_distribution as $rating => $percentage): ?>
-        <div class="bar-container">
-            <div class="bar-label"><?php echo $rating; ?></div>
-            <div class="bar" style="width: <?php echo $percentage; ?>%;"></div>
+    <div class="main-content">
+        <!-- Professor Name -->
+        <div class="professor-name">
+            Professor Name: <span class="highlighted-name"><?php echo htmlspecialchars($professor_name); ?></span>
         </div>
-        <?php endforeach; ?>
-    </div>
 
-    <!-- Hidden Content -->
-    <div class="content"></div>
+        <!-- Rating -->
+        <div class="professor-rating">
+            <span class="rating-number highlighted-rating"><?php echo $avg_rating; ?></span> / 5
+        </div>
 
-    <div class="review-section">
-        <h2>Leave a Review</h2>
-        <form action="submit_review.php" method="POST">
-            <textarea class="review-box" name="review" placeholder="Write your review here..." required></textarea>
-            <input type="hidden" name="prof_id" value="<?php echo $professor_id; ?>">
-            <br>
-            <button type="submit" class="submit-review">Submit Review</button>
-        </form>
+        <!-- Department and University Info -->
+        <div class="professor-info">
+            <span class="highlighted-name"><?php echo htmlspecialchars($professor_name); ?></span> works in the Department of 
+            <span class="highlighted-department"><?php echo htmlspecialchars($department); ?></span> at 
+            <span class="highlighted-university"><?php echo htmlspecialchars($university); ?></span>.
+        </div>
+
+        <!-- Rate Button -->
+        <div class="rate-button-container">
+            <a href="rate_professor.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
+        </div>
+
+        <!-- Rating Distribution -->
+        <div class="rating-distribution">
+            <h3>Rating Distribution (<?php echo $total_ratings; ?> Ratings)</h3>
+            <?php foreach ($rating_distribution as $rating => $percentage): ?>
+            <div class="bar-container">
+                <div class="bar-label"><?php echo $rating; ?></div>
+                <div class="bar" style="width: <?php echo $percentage; ?>%;"></div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Leave a Review Section -->
+        <div class="review-section">
+            <h2>Leave a Review</h2>
+            <form action="submit_review.php" method="POST">
+                <textarea class="review-box" name="review" placeholder="Write your review here..." required></textarea>
+                <input type="hidden" name="prof_id" value="<?php echo $professor_id; ?>">
+                <br>
+                <button type="submit" class="submit-review">Submit Review</button>
+            </form>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-list">
+            <h2>Reviews</h2>
+            <?php if (mysqli_num_rows($comments_result) > 0): ?>
+                <?php while ($comment = mysqli_fetch_assoc($comments_result)): ?>
+                    <div class="review-item">
+                        <div class="review-content">
+                            <p><?php echo htmlspecialchars($comment['comment']); ?></p>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>No reviews yet. Be the first to leave a review!</p>
+            <?php endif; ?>
+        </div>
     </div>
-    
 
 </body>
 
