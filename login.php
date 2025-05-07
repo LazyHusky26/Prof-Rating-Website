@@ -19,7 +19,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = mysqli_fetch_assoc($prof_result);
 
         if (password_verify($password, $user['password'])) {
-            echo "<script>alert('Login successful! Welcome, Professor " . $user['name'] . "');</script>";
+            $_SESSION['prof_id'] = $user['id'];
+            $_SESSION['prof_name'] = $user['name'];
+            header("Location: search_bar.php"); // Redirect to search_bar.php
+            exit();
         } else {
             echo "<script>alert('Failed: Incorrect password.');</script>";
         }
@@ -29,7 +32,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $user['password'])) {
             $_SESSION['student_id'] = $user['id'];
             $_SESSION['student_name'] = $user['name'];
-            echo "<script>alert('Login successful! Welcome, Student " . $user['name'] . "');</script>";
+            header("Location: search_bar.php"); // Redirect to search_bar.php
+            exit();
         } else {
             echo "<script>alert('Failed: Incorrect password.');</script>";
         }
@@ -58,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="nav-links">
       <a href="#">Blog</a>
       <a href="#">Help</a>
-      <a href="#" class="cta">Sign In</a>
+      <a href="register.php" class="cta">Sign In</a>
     </div>
   </nav>
 
@@ -71,12 +75,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<script>alert('⚠ Incorrect password. Please try again.');</script>";
         }
     }
+    if (isset($_GET['success']) && $_GET['success'] == 1) {
+        echo "<script>alert('🎉 Account successfully created! Please log in.');</script>";
+    }
     ?>
 
     <form class="login-card animate-fade" method="POST" action="">
       <h2>Log In</h2>
       <p class="welcome-text">Welcome back! Please login to continue 🚀</p>
-      <p class="signup">New to ProfRate? <a href="#">Sign up!</a></p>
+      <p class="signup">New to ProfRate? <a href="register.php">Sign up!</a></p>
 
       <input type="email" name="email" placeholder="Email Address" required />
       <input type="password" name="password" placeholder="Password" required />
