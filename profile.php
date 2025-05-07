@@ -311,7 +311,7 @@ $comments_result = mysqli_query($conn, $comments_sql);
 
         <!-- Rate Button -->
         <div class="rate-button-container">
-            <a href="question.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
+            <a href="questions.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
         </div>
 
         <!-- Rating Distribution -->
