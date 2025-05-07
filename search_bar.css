@@ -178,3 +178,55 @@ input:checked + .slider::before {
     color: rgba(255, 255, 255, 0.6);
     padding: 0 20px;
 }
+
+.auth-buttons {
+    position: absolute;
+    top: 20px;
+    right: 120px; /* Adjusted from 20px to 40px to move the buttons left */
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap; /* Ensures buttons wrap if they exceed the viewport width */
+}
+
+.auth-buttons button {
+    background-color: #e6bd09; /* Yellow background */
+    color: black;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.auth-buttons button:hover {
+    background-color: #d4aa00; /* Darker yellow on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+.auth-buttons .logout {
+    background-color: #ff4d4d; /* Red background for Logout */
+    color: white;
+}
+
+.auth-buttons .logout:hover {
+    background-color: #e60000; /* Darker red on hover */
+}
+
+.auth-buttons .logout {
+    background: #ff4d4d; /* Red background for Logout */
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.auth-buttons .logout:hover {
+    background: #e60000; /* Darker red on hover */
+}
