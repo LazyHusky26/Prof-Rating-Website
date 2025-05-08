@@ -3,7 +3,7 @@
 ProfRate is a web-based platform designed to help students share feedback about professors and make informed academic choices. It supports role-based access for students, professors, and admins, and includes secure registration, dynamic feedback, and a searchable interface.
 
 ## Deployment and Code Access
-**Local Deployment Website functionalty Video Link**
+**Website functionalty Video Link(Local Deployment)**
 [https://youtu.be/E8lOpcWm_Cw?si=y5yDtIrI8nFd9cX3](https://youtu.be/E8lOpcWm_Cw?si=y5yDtIrI8nFd9cX3)
 
 
