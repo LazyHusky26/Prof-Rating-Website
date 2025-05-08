@@ -21,12 +21,14 @@ if (!empty($query)) {
     }
 
     if (mysqli_num_rows($result) > 0) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            if ($searchType === 'universities') {
-                echo "<div class='result-item'>";
+        if ($searchType === 'universities') {
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo "<div class='result-item' onclick=\"window.location.href='university.php?university=" . urlencode($row['university']) . "'\">";
                 echo "<strong>" . htmlspecialchars($row['university']) . "</strong>";
                 echo "</div>";
-            } else {
+            }
+        } else {
+            while ($row = mysqli_fetch_assoc($result)) {
                 echo "<div class='result-item' onclick=\"window.location.href='profile.php?id=" . $row['id'] . "'\">";
                 echo "<strong>" . htmlspecialchars($row['name']) . "</strong><br>";
                 echo "<small>" . htmlspecialchars($row['department']) . " - " . htmlspecialchars($row['university']) . "</small>";
