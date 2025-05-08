@@ -267,8 +267,8 @@ mysqli_close($conn);
 </div>
 
 <script>
-document.getElementById("userTypeToggle").addEventListener("change", function () {
-    const isProfessor = this.checked;
+function initializeFormState() {
+    const isProfessor = document.getElementById("userTypeToggle").checked;
     const studentSection = document.getElementById("studentIdSection");
     const professorSection = document.getElementById("professorDocSection");
     const hiddenType = document.getElementById("hiddenUserType");
@@ -283,24 +283,34 @@ document.getElementById("userTypeToggle").addEventListener("change", function ()
         studentSection.style.display = "none";
         professorSection.style.display = "block";
         hiddenType.value = "professor";
+
         // Set required for professor fields
         universityName.required = true;
         department.required = true;
         professorDocUpload.required = true;
+
         // Remove required from student field
         studentIdUpload.required = false;
     } else {
         studentSection.style.display = "block";
         professorSection.style.display = "none";
         hiddenType.value = "student";
+
         // Set required for student field
         studentIdUpload.required = true;
+
         // Remove required from professor fields
         universityName.required = false;
         department.required = false;
         professorDocUpload.required = false;
     }
-});
+}
+
+// Initialize form state on page load
+document.addEventListener("DOMContentLoaded", initializeFormState);
+
+// Update form state when the toggle is changed
+document.getElementById("userTypeToggle").addEventListener("change", initializeFormState);
 </script>
 
 </body>
