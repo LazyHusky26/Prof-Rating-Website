@@ -86,7 +86,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ?>
 
     <?php
-    if (isset($_GET['success']) && $_GET['success'] == 1) {
+    if (isset($_GET['registered']) && $_GET['registered'] == 1) {
+        echo "<script>alert('🎉 Account successfully created! Please log in.');</script>";
+    }
+    if (isset($_GET['reset']) && $_GET['reset'] == 1) {
         echo "<script>alert('🎉 Password successfully reset! Please log in.');</script>";
     }
     ?>
