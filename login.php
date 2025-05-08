@@ -80,6 +80,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     ?>
 
+    <?php
+    if (isset($_GET['success']) && $_GET['success'] == 1) {
+        echo "<script>alert('🎉 Password successfully reset! Please log in.');</script>";
+    }
+    ?>
+
     <form class="login-card animate-fade" method="POST" action="">
       <h2>Log In</h2>
       <p class="welcome-text">Welcome back! Please login to continue 🚀</p>
@@ -89,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <input type="password" name="password" placeholder="Password" required />
 
       <div class="forgot">
-        <a href="#">Forgot password?</a>
+        <a href="forgot_password.php">Forgot password?</a>
       </div>
 
       <button type="submit" class="login-btn">Log In</button>
