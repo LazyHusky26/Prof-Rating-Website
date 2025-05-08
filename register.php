@@ -245,20 +245,20 @@ mysqli_close($conn);
         <!-- Student Section -->
         <div class="student-id-upload-container" id="studentIdSection">
             <label for="studentIdUpload" class="upload-label">Upload Student ID</label>
-            <input type="file" id="studentIdUpload" name="studentIdUpload" accept="image/*">
+            <input type="file" id="studentIdUpload" name="studentIdUpload" accept="image/*" required>
             <div class="error" id="studentIdError"></div>
         </div>
 
         <!-- Professor Section -->
         <div class="student-id-upload-container" id="professorDocSection" style="display: none;">
-            <input type="text" id="universityName" name="universityName" placeholder="University Name">
+            <input type="text" id="universityName" name="universityName" placeholder="University Name" required>
             <div class="error" id="universityError"></div>
 
-            <input type="text" id="department" name="department" placeholder="Department"> <!-- New department input -->
+            <input type="text" id="department" name="department" placeholder="Department" required> <!-- New department input -->
             <div class="error" id="departmentError"></div>
 
             <label for="professorDocUpload" class="upload-label">Verification Document</label>
-            <input type="file" id="professorDocUpload" name="professorDocUpload" accept=".pdf,.doc,.docx,image/*">
+            <input type="file" id="professorDocUpload" name="professorDocUpload" accept=".pdf,.doc,.docx,image/*" required>
             <div class="error" id="professorDocError"></div>
         </div>
 
@@ -273,14 +273,32 @@ document.getElementById("userTypeToggle").addEventListener("change", function ()
     const professorSection = document.getElementById("professorDocSection");
     const hiddenType = document.getElementById("hiddenUserType");
 
+    // Get all relevant fields
+    const studentIdUpload = document.getElementById("studentIdUpload");
+    const universityName = document.getElementById("universityName");
+    const department = document.getElementById("department");
+    const professorDocUpload = document.getElementById("professorDocUpload");
+
     if (isProfessor) {
         studentSection.style.display = "none";
         professorSection.style.display = "block";
         hiddenType.value = "professor";
+        // Set required for professor fields
+        universityName.required = true;
+        department.required = true;
+        professorDocUpload.required = true;
+        // Remove required from student field
+        studentIdUpload.required = false;
     } else {
         studentSection.style.display = "block";
         professorSection.style.display = "none";
         hiddenType.value = "student";
+        // Set required for student field
+        studentIdUpload.required = true;
+        // Remove required from professor fields
+        universityName.required = false;
+        department.required = false;
+        professorDocUpload.required = false;
     }
 });
 </script>
