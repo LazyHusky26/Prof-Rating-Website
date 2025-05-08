@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_num_rows($prof_result) > 0) {
             $update_query = "UPDATE prof_login SET password = '$hashed_password' WHERE email = '$email'";
             if (mysqli_query($conn, $update_query)) {
-                header("Location: login.php?success=1");
+                header("Location: login.php?reset=1");
                 exit();
             } else {
                 $error = "Error updating password for professor.";
