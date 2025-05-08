@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Include database connection file
 include('site_database.php');
 
@@ -38,14 +39,16 @@ $ratings_result = mysqli_query($conn, $ratings_sql);
 $rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
 $total_ratings = 0;
 
+// Populate the rating distribution and calculate the total ratings
 while ($row = mysqli_fetch_assoc($ratings_result)) {
     $rating_distribution[$row['rounded_rating']] = $row['count'];
-    $total_ratings += $row['count']; // Calculate total ratings
+    $total_ratings += $row['count'];
 }
 
 // Calculate percentage for each rating
+$rating_percentages = [];
 foreach ($rating_distribution as $rating => $count) {
-    $rating_distribution[$rating] = $total_ratings > 0 ? ($count / $total_ratings) * 100 : 0;
+    $rating_percentages[$rating] = $total_ratings > 0 ? round(($count / $total_ratings) * 100, 2) : 0;
 }
 
 // Fetch reviews for the professor
@@ -151,7 +154,9 @@ $comments_result = mysqli_query($conn, $comments_sql);
 
         /* Rating Distribution */
         .rating-distribution {
-            margin-top: 40px;
+            margin-top: 50px;
+            max-width: 500px;
+            margin-bottom: 50px; /* Add this line for spacing below the graph */
         }
 
         .bar-container {
@@ -161,17 +166,37 @@ $comments_result = mysqli_query($conn, $comments_sql);
         }
 
         .bar-label {
-            width: 50px;
+            width: 30px;
             font-size: 18px;
             color: #ffffff;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        .bar-outer {
+            width: 500px; /* fixed width for all bars */
+            background: #333;
+            border-radius: 10px;
+            margin-right: 10px;
+            height: 30px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
         .bar {
-            height: 30px;
+            height: 100%;
             background-color: #e6bd09;
-            margin-left: 10px;
-            border-radius: 10px;
+            border-radius: 10px 0 0 10px;
             transition: width 0.8s ease-in-out;
+        }
+
+        .bar-count {
+            width: 80px; /* fixed width for alignment */
+            font-size: 16px;
+            color: #ffffff;
+            text-align: left;
+            margin-left: 0;
         }
 
         /* Rate Button */
@@ -279,6 +304,52 @@ $comments_result = mysqli_query($conn, $comments_sql);
         .review-item:last-child {
             margin-bottom: 0;
         }
+
+        /* Popup Styles */
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-content {
+            background: #111;
+            color: #e6bd09;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .popup-content p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .popup-content button {
+            background: #e6bd09;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .popup-content button:hover {
+            background: #d4aa00;
+        }
     </style>
 </head>
 <body>
@@ -291,7 +362,7 @@ $comments_result = mysqli_query($conn, $comments_sql);
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="main-content">  
         <!-- Professor Name -->
         <div class="professor-name">
             Professor Name: <span class="highlighted-name"><?php echo htmlspecialchars($professor_name); ?></span>
@@ -311,29 +382,30 @@ $comments_result = mysqli_query($conn, $comments_sql);
 
         <!-- Rate Button -->
         <div class="rate-button-container">
-            <a href="questions.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
+            <?php if (!isset($_SESSION['student_id']) && !isset($_SESSION['prof_id'])): ?>
+                <!-- Not logged in -->
+                <button class="rate-button" type="button" onclick="showPopup('You must be logged in as a student to rate a professor.')">Rate This Professor</button>
+            <?php elseif (isset($_SESSION['prof_id'])): ?>
+                <!-- Logged in as professor -->
+                <button class="rate-button" type="button" onclick="showPopup('Only students can rate a professor.')">Rate This Professor</button>
+            <?php elseif (isset($_SESSION['student_id'])): ?>
+                <!-- Logged in as student -->
+                <a href="questions.php?id=<?php echo $professor_id; ?>" class="rate-button">Rate This Professor</a>
+            <?php endif; ?>
         </div>
 
         <!-- Rating Distribution -->
         <div class="rating-distribution">
             <h3>Rating Distribution (<?php echo $total_ratings; ?> Ratings)</h3>
-            <?php foreach ($rating_distribution as $rating => $percentage): ?>
+            <?php foreach ($rating_distribution as $rating => $count): ?>
             <div class="bar-container">
                 <div class="bar-label"><?php echo $rating; ?></div>
-                <div class="bar" style="width: <?php echo $percentage; ?>%;"></div>
+                <div class="bar-outer">
+                    <div class="bar" style="width: <?php echo $rating_percentages[$rating]; ?>%;"></div>
+                </div>
+                <div class="bar-count"><?php echo $count; ?> People</div>
             </div>
             <?php endforeach; ?>
-        </div>
-
-        <!-- Leave a Review Section -->
-        <div class="review-section">
-            <h2>Leave a Review</h2>
-            <form action="submit_review.php" method="POST">
-                <textarea class="review-box" name="review" placeholder="Write your review here..." required></textarea>
-                <input type="hidden" name="prof_id" value="<?php echo $professor_id; ?>">
-                <br>
-                <button type="submit" class="submit-review">Submit Review</button>
-            </form>
         </div>
 
         <!-- Reviews Section -->
@@ -351,7 +423,56 @@ $comments_result = mysqli_query($conn, $comments_sql);
                 <p>No reviews yet. Be the first to leave a review!</p>
             <?php endif; ?>
         </div>
+
+        <!-- Leave a Review Section -->
+        <div class="review-section">
+            <h2>Leave a Review</h2>
+            <form action="submit_review.php" method="POST">
+                <textarea class="review-box" name="review" placeholder="Write your review here..." required></textarea>
+                <input type="hidden" name="prof_id" value="<?php echo $professor_id; ?>">
+                <br>
+                <?php if (!isset($_SESSION['student_id']) && !isset($_SESSION['prof_id'])): ?>
+                    <!-- Not logged in -->
+                    <button type="button" class="submit-review" onclick="showPopup('You must be logged in as a student to leave a review.')">Submit Review</button>
+                <?php elseif (isset($_SESSION['prof_id'])): ?>
+                    <!-- Logged in as professor -->
+                    <button type="button" class="submit-review" onclick="showPopup('Only students can leave a review.')">Submit Review</button>
+                <?php elseif (isset($_SESSION['student_id'])): ?>
+                    <!-- Logged in as student -->
+                    <button type="submit" class="submit-review">Submit Review</button>
+                <?php endif; ?>
+            </form>
+        </div>
     </div>
+
+    <script>
+        function showPopup(message) {
+            // Create the popup container
+            const popup = document.createElement('div');
+            popup.className = 'popup-container';
+
+            // Create the popup content
+            const popupContent = document.createElement('div');
+            popupContent.className = 'popup-content';
+            popupContent.innerHTML = `
+                <p>${message}</p>
+                <button onclick="closePopup()">OK</button>
+            `;
+
+            // Append the content to the container
+            popup.appendChild(popupContent);
+
+            // Append the popup to the body
+            document.body.appendChild(popup);
+        }
+
+        function closePopup() {
+            const popup = document.querySelector('.popup-container');
+            if (popup) {
+                popup.remove();
+            }
+        }
+    </script>
 
 </body>
 
