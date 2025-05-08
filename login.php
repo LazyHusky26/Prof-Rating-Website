@@ -51,6 +51,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>ProfRate - Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="login.css" />
+    <script>
+        function showHelpPopup() {
+            alert("For any queries, send a mail to: help@profrate.com");
+        }
+    </script>
 </head>
 <body>
   <div class="stars-bg"></div>
@@ -61,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="logo">ProfRate 🚀</div>
     <div class="nav-links">
       <a href="#">Blog</a>
-      <a href="#">Help</a>
+      <a href="javascript:void(0);" onclick="showHelpPopup()">Help</a>
       <a href="register.php" class="cta">Sign In</a>
     </div>
   </nav>
